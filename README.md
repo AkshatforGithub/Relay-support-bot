@@ -4,7 +4,7 @@ An n8n-built customer support bot that answers from a real knowledge base and li
 
 ![The complete Relay workflow as built in n8n](docs/images/relay-workflow-full.png)
 
-**Read the full write-up:** [Case study](docs/case-study.md) · [PDF version](docs/case-study.pdf)
+**Read the full write-up:** [Case study](docs/case-study.md) 
 
 ---
 
