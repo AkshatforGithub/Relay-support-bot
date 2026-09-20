@@ -37,7 +37,7 @@ flowchart LR
     M --> J
 ```
 
-![The complete Relay workflow as built in n8n: the conversation pipeline plus the /resolve-ticket workflow (bottom left)](docs/relay-workflow-full.png)
+![The complete Relay workflow as built in n8n: the conversation pipeline plus the /resolve-ticket workflow (bottom left)](/relay-workflow-full.png)
 
 Every box in that diagram exists because a naive version of this workflow broke in a specific way during testing. The rest of this write-up walks through the three hardest problems and how each one shows up in the actual build.
 
@@ -47,7 +47,7 @@ Every box in that diagram exists because a naive version of this workflow broke 
 
 A single LLM call answering support questions has an accuracy ceiling: it can hallucinate a confident, wrong answer with no self-check. Relay uses a **two-model Brain + Critic pattern** instead of a single pass.
 
-![Workflow Brain (section 3) and the Critic verification pass (section 5) on the n8n canvas](docs/relay-brain-critic.png)
+![Workflow Brain (section 3) and the Critic verification pass (section 5) on the n8n canvas](/relay-brain-critic.png)
 
 The **Workflow Brain** is the primary agent. It's given exactly four tools — knowledge base search (Pinecone, embedded via Google Gemini), order lookup, a check for existing open tickets, and a structured JSON output function — and a system prompt that explicitly forbids it from answering anything outside those tools' returned data. That constraint was the single biggest accuracy lever in the whole build: an agent with unrestricted "general knowledge" access will answer out-of-scope questions confidently and incorrectly, which is worse than not answering at all.
 
@@ -74,7 +74,7 @@ The parts of this workflow that took the longest weren't the AI logic — they w
 - **Duplicate delivery:** Telegram (like most webhook providers) can redeliver the same update. Every incoming message is checked against a `processed_updates` table before anything else runs, and the update is marked *before* processing starts — not after — so a workflow crash mid-run can't cause a duplicate reply on retry.
 - **Same-user hammering:** a user spamming the bot (accidentally or deliberately) can't be allowed to burn API budget or spam Slack with duplicate escalations.
 
-![Rate limiting and duplicate-detection guard rails](docs/relay-rate-limiting.png)
+![Rate limiting and duplicate-detection guard rails](/relay-rate-limiting.png)
 
 - **Silent failure = the worst outcome:** the failure mode I cared about most wasn't a workflow erroring — it was a workflow erroring *and the user never finding out*, left staring at an unanswered message. Every branch that can fail (rate-limit lookup, ticket creation, the Brain/Critic calls) is wired with `continueRegularOutput`/`continueErrorOutput` and a dedicated notify-user fallback, so a backend failure degrades to an apology message instead of silence.
 - **Retry with backoff:** every Supabase read/write carries automatic retries (2 attempts, 1s backoff) for the transient failures that are normal at any real scale, not evidence of a broken system.
@@ -115,7 +115,7 @@ The system prompt for the Workflow Brain went through several rewrites, and the 
 
 The part most portfolio bots skip entirely: what happens once a conversation is flagged for a human. Relay treats this as its own subsystem, not an afterthought.
 
-![The ticket-resolution workflow, triggered from a Slack slash command](docs/relay-ticket-resolution.png)
+![The ticket-resolution workflow, triggered from a Slack slash command](/relay-ticket-resolution.png)
 
 When the Brain+Critic pipeline decides a conversation needs a human, Relay checks for an existing open ticket, creates one if needed, and posts it to Slack. A support teammate resolves it with a `/resolve-ticket` **slash command directly from Slack** — no separate admin panel. That command runs its own small workflow: parse the command, update the ticket's status in Supabase, confirm back to Slack whether the update succeeded or the ticket ID didn't match anything.
 
