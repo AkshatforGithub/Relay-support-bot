@@ -2,7 +2,7 @@
 
 An n8n-built customer support bot that answers from a real knowledge base and live order data, **verifies every answer with a second, independent model before sending it**, and hands off to a human through a tracked Slack ticket when it can't help.
 
-![The complete Relay workflow as built in n8n](docs/images/relay-workflow-full.png)
+![The complete Relay workflow as built in n8n](docs/relay-workflow-full.png)
 
 **Read the full write-up:** [Case study](docs/case-study.md) 
 
