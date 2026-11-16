@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+venv/
+env/
+__.pycache__
+
+# Environment variables
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+*.swp
+*.swo
+
+# IDE files
+.vscode/
+.idea/
+*.tsvc
+
+# Data storage
+*.db
+*.sqlite
+
+# Plan files (keep CLAUDE.md tracked, but exclude plan directory from version control if needed)
+.claude/plans/
+
+# Runtime artifacts
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# Temporary
+tmp/
