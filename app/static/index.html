@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relay AI Support Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Auth box: appears on load, asks for admin key -->
+  <div id="auth-box">
+    <div class="auth-card">
+      <h2>Admin Authentication</h2>
+      <p>Enter your admin API key to access the dashboard.</p>
+      <input type="password" id="api-key" placeholder="X-API-Key">
+      <button id="sign-in-btn">Sign In</button>
+      <button class="sign-out" id="sign-out-btn" disabled="disabled">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- API error banner -->
+  <div id="api-error" role="alert">
+    Invalid API key. Please sign in again.
+  </div>
+
+  <!-- Dashboard panels (initially hidden) -->
+  <div id="dashboard" style="display: none;">
+    <!-- System Stats Panel -->
+    <div class="panel" id="stats-panel">
+      <h3>System Stats</h3>
+      <div class="refresh-indicator">Refreshing every 300s</div>
+      <div id="stats-content">Loading...</div>
+    </div>
+
+    <!-- Tickets Panel -->
+    <div class="panel" id="tickets-panel">
+      <h3>Tickets</h3>
+      <div class="refresh-indicator">Refreshing every 60s</div>
+      <div id="tickets-content">Loading...</div>
+    </div>
+
+    <!-- Conversation Panel -->
+    <div class="panel" id="conversation-panel">
+      <h3>Conversation Viewer</h3>
+      <input type="text" id="conv-textbox" placeholder="Enter chat ID">
+      <button id="conv-load-btn">Load Conversation</button>
+      <div id="conv-content">Enter a chat ID to view conversation</div>
+      <div class="refresh-indicator">Refreshing every 30s while open</div>
+    </div>
+  </div>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>

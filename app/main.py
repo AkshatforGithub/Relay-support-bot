@@ -3,6 +3,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from typing import Optional
 import os
 
@@ -27,6 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files for dashboard
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 # Include API routes
 app.include_router(router, prefix="/api", tags=["api"])
 
@@ -35,7 +40,13 @@ app.include_router(router, prefix="/api", tags=["api"])
 async def health_check():
     return {"status": "ok", "service": "relay-api"}
 
-# Root endpoint
+# Root endpoint - redirect to dashboard
 @app.get("/", include_in_schema=False)
 async def root():
-    return {"message": "Relay AI Support System API", "docs": "/api/docs"}
+    return RedirectResponse(url="/dashboard")
+
+# Dashboard endpoint
+@app.get("/dashboard", include_in_schema=False)
+async def dashboard():
+    from fastapi.responses import FileResponse
+    return FileResponse("app/static/index.html")

@@ -1,0 +1,218 @@
+/* Relay Dashboard - Simple card layout, light/dark friendly */
+:root {
+  --bg: #f8f9fa;
+  --fg: #212529;
+  --muted: #6c757d;
+  --accent: #28a745;
+  --danger: #dc3545;
+  --card: #ffffff;
+  --border: #dee2e6;
+}
+
+[data-theme="dark"] {
+  --bg: #212529;
+  --fg: #f8f9fa;
+  --muted: #6c757d;
+  --accent: #28a745;
+  --danger: #dc3545;
+  --card: #343a40;
+  --border: #495057;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+}
+
+#auth-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#auth-box.hidden {
+  display: none;
+}
+
+.auth-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.auth-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: var(--fg);
+}
+
+.auth-card p {
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-card button:hover {
+  background: #218838;
+}
+
+.auth-card button:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+.sign-out {
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.sign-out:hover {
+  background: var(--danger);
+  color: white;
+}
+
+#api-error {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--danger);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  display: none;
+  z-index: 1001;
+}
+
+#api-error.visible {
+  display: block;
+}
+
+.panel {
+  padding: 1.5rem;
+  margin: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 200px;
+}
+
+.panel h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.panel .empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.ticket-row:hover {
+  background: var(--bg);
+}
+
+.ticket-row.resolved {
+  opacity: 0.6;
+}
+
+.ticket-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.ticket-status.pending {
+  background: #fffd9a;
+  color: #000;
+}
+
+.ticket-status.resolved {
+  background: var(--accent);
+  color: white;
+}
+
+#loading {
+  text-align: center;
+  color: var(--muted);
+  padding: 2rem;
+}
+
+/* Conversation panel */
+#conv-textbox {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Refresh indicators */
+.refresh-indicator {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}

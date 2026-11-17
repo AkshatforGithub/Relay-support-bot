@@ -103,14 +103,14 @@ class TicketsResponse(BaseModel):
 
 class SystemStatsResponse(BaseModel):
     """Response model for system stats endpoint."""
-    dupesSuppressed: int
-    rateLimitFalsePositives: int
-    silentFailures: int
-    medianResponseTime: float
-    p95ResponseTime: float
-    criticFirstPassApproval: int
-    autoResolutionRate: int
-    escalationRate: int
+    # Live computed values from Supabase
+    total_tickets: int
+    pending_tickets: int
+    resolved_tickets: int
+    escalation_rate: int
+    active_conversations_30d: int
+
+    # Test-bench metrics from case-study.md (hardcoded benchmark values)
     test_bench: dict = Field(
         ..., description="Test-bench metrics from case-study.md labeled as test-results"
     )
@@ -287,7 +287,7 @@ async def get_tickets(
     response_model=SystemStatsResponse,
     tags=["system"],
 )
-async def get_system_stats(
+def get_system_stats(
     x_api_key: str = Depends(get_api_key),
     supabase=Depends(get_supabase),
 ):
@@ -310,47 +310,40 @@ async def get_system_stats(
             .execute()
         resolved_tickets = resolved_query.count or 0
 
-        # Compute escalation rate: tickets not resolved / total tickets
-        if total_tickets > 0:
-            escalation_rate = round(((total_tickets - resolved_tickets) / total_tickets) * 100)
-        else:
-            escalation_rate = 0
+        # Compute pending tickets (not resolved)
+        pending_tickets = total_tickets - resolved_tickets
 
-        # Compute active conversations from chat_memory (distinct chat_ids with recent activity)
-        # Active = messages within the last 30 days
+        # Compute escalation rate: 100 * total_tickets / distinct chat_ids in chat_memory
+        # 0 when there are no chats
         from datetime import datetime, timedelta
         thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).isoformat()
 
-        active_query = supabase.table("chat_memory")\
-            .select("chat_id", count="exact")\
-            .gt("created_at", thirty_days_ago)\
-            .execute()
-        active_conversations = active_query.count or 0
-        # Count distinct chat_ids
-        if active_conversations > 0:
-            # Get distinct chat_ids
-            distinct_query = supabase.table("chat_memory")\
-                .select("chat_id", count="exact")\
+        # Select only chat_id column and paginate with range() to avoid 1000-row truncation
+        distinct_chat_ids = set()
+        # Use a large range to ensure we get all chat_ids (default limit is 1000)
+        for i in range(0, 100000, 1000):
+            end = min(i + 1000, 100001)
+            query = supabase.table("chat_memory")\
+                .select("chat_id")\
+                .range(i, end - 1)\
                 .gt("created_at", thirty_days_ago)\
                 .execute()
-            # Use count of distinct - but supabase count may not give distinct directly
-            # So we'll compute from the data
-            chat_ids = set()
-            for msg in (distinct_query.data or []):
-                chat_ids.add(msg.get("chat_id"))
-            active_conversations = len(chat_ids)
+            for msg in (query.data or []):
+                cid = msg.get("chat_id")
+                if cid:
+                    distinct_chat_ids.add(cid)
+            # Stop as soon as a page returns fewer than 1000 rows
+            if len(query.data or []) < 1000:
+                break
+        distinct_count = len(distinct_chat_ids)
+
+        if total_tickets > 0 and distinct_count > 0:
+            escalation_rate = round(100 * total_tickets / distinct_count, 1)
         else:
-            active_conversations = 0
+            escalation_rate = 0
 
-        # Compute dupes suppressed from processed_updates table
-        dupes_query = supabase.table("processed_updates").select("update_id", count="exact").execute()
-        dupes_suppressed = dupes_query.count or 0
-
-        # Rate limit false positives - architectural guarantee per design
-        rate_limit_false_positives = 0
-
-        # Silent failures - architectural guarantee per design
-        silent_failures = 0
+        # Compute active conversations (distinct chat_ids with messages in last 30 days)
+        active_conversations_30d = distinct_count
 
         # Test-bench metrics from case-study.md
         # These are simulated benchmark values, not computed from tables
@@ -367,14 +360,11 @@ async def get_system_stats(
 
         # Build the response
         stats = SystemStatsResponse(
-            dupesSuppressed=dupes_suppressed,
-            rateLimitFalsePositives=rate_limit_false_positives,
-            silentFailures=silent_failures,
-            medianResponseTime=4.8,  # default test-bench value
-            p95ResponseTime=11.2,    # default test-bench value
-            criticFirstPassApproval=83,  # default test-bench value
-            autoResolutionRate=61,  # default test-bench value
-            escalationRate=escalation_rate,
+            total_tickets=total_tickets,
+            pending_tickets=pending_tickets,
+            resolved_tickets=resolved_tickets,
+            escalation_rate=escalation_rate,
+            active_conversations_30d=active_conversations_30d,
             test_bench=test_bench,
         )
 
