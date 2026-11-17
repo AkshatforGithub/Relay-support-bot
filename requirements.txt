@@ -9,14 +9,14 @@ fastapi==0.109.2
 uvicorn[standard]==0.30.4
 
 # Supabase client
-supabase==2.4.0
+supabase==2.34.1
 
 # HTTP client for webhooks
-httpx>=0.24,<0.26
+httpx
 
 # Utilities
 python-dotenv==1.0.1
 
 # Optional: for testing
 pytest==8.3.4
-pytest-asyncio==0.23.8
+pytest-asyncio==0.23.8websockets>=13,<16
