@@ -36,3 +36,5 @@ logs/
 # Temporary
 tmp/
 .venv
+
+__pycache__/

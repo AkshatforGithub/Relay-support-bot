@@ -7,7 +7,7 @@ from typing import Optional
 import os
 
 from app.api.endpoints import router
-from app.core.config import settings
+from app.core import config as settings
 
 # Create FastAPI app
 app = FastAPI(
@@ -36,6 +36,6 @@ async def health_check():
     return {"status": "ok", "service": "relay-api"}
 
 # Root endpoint
-@app.get("/", include_outline=False)
+@app.get("/", include_in_schema=False)
 async def root():
     return {"message": "Relay AI Support System API", "docs": "/api/docs"}
